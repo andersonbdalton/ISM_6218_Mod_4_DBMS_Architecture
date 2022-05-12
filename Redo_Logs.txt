@@ -1,0 +1,27 @@
+-- The redo logs (or write ahead logs) provide an efficient
+-- I/O mechanism to get transaction information to disk
+-- (and relative safety).  This information can be used to
+-- "redo" transactions in the event of recovery, as well as
+-- provide an efficient mechanism for COMMIT processing.
+-- DJ Berndt (dberndt@usf.edu)
+
+-- So, look at the redo log files for the our instance.
+
+SELECT
+	group# AS "Group#",
+	SUBSTR(member, 1, 50) AS "File Name"
+FROM v$logfile;
+
+
+-- What does the I/O look like?
+
+SELECT
+	name AS "Stat Name",
+	value AS "Value"
+FROM v$sysstat
+WHERE name LIKE 'redo%writes';
+
+-- What is the sequence of the logs?
+
+SELECT MAX(sequence#) AS "Last Sequence#"
+FROM v$log;

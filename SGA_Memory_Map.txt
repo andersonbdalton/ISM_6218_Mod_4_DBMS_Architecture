@@ -1,0 +1,67 @@
+-- As we have seen, Oracle uses shared memory for
+-- interprocess communication making this a critical
+-- aspect for database performance.  So, what does
+-- shared memory look like on our instance?
+-- We can make a quick map using the dynamic
+-- v$sgastat view (adapted from a web version).
+-- DJ Berndt (dberndt@usf.edu)
+
+SELECT
+  'DB Buffer Cache' AS Area,
+  COUNT(*) AS Entries,
+  SUM(bytes) AS Bytes,
+  ROUND(SUM(bytes/1048576),2) AS MB
+FROM v$sgastat
+WHERE
+  pool IS NULL AND
+  name LIKE 'buffer_cache'
+GROUP BY name
+UNION ALL
+SELECT
+  'Log Buffer' AS Area,
+  COUNT(*) AS Entries,
+  SUM(bytes) AS Bytes,
+  ROUND(SUM(bytes/1048576),2) AS MB
+FROM v$sgastat
+WHERE
+  pool IS NULL AND
+  name LIKE 'log_buffer'
+GROUP BY name
+UNION ALL
+SELECT
+  'Fixed SGA' AS Area,
+  COUNT(*) AS Entries,
+  SUM(bytes) AS Bytes,
+  ROUND(SUM(bytes/1048576),2) AS MB
+FROM v$sgastat
+WHERE
+  pool IS NULL AND
+  name LIKE 'fixed_sga'
+GROUP BY name
+UNION ALL
+SELECT
+  'Shared Pool' AS Area,
+  COUNT(*) AS Entries,
+  SUM(bytes) AS Bytes,
+  ROUND(SUM(bytes/1048576),2) AS MB
+FROM v$sgastat
+WHERE pool LIKE 'shared pool'
+GROUP BY pool
+UNION ALL
+SELECT
+  'Large Pool' AS Area,
+  COUNT(*) AS Entries,
+  SUM(bytes) AS Bytes,
+  ROUND(SUM(bytes/1048576),2) AS MB
+FROM v$sgastat
+WHERE pool LIKE 'large pool'
+GROUP BY pool
+UNION ALL
+SELECT
+  'Java Pool' AS Area,
+  COUNT(*) AS Entries,
+  SUM(bytes) AS Bytes,
+  ROUND(SUM(bytes/1048576),2) AS MB
+FROM v$sgastat
+WHERE pool LIKE 'java pool'
+GROUP BY pool

@@ -1,0 +1,11 @@
+-- This script looks at the databae buffer cache hit ratio.
+-- The database buffer cache is the core data block I/O shared
+-- memory area and has a large impact on performance.
+-- A reasonable rule of thumb is to be at a hit ratio of 95% or better.
+-- DJ Berndt (dberndt@usf.edu)
+
+SELECT
+	ROUND(((1-(SUM(DECODE(name, 'physical reads', value, 0)) / 
+	(SUM(DECODE(name, 'db block gets', value, 0)) +
+	(SUM(DECODE(name, 'consistent gets', value, 0)))))) * 100), 3) "Hit Ratio (%)"
+FROM v$sysstat;

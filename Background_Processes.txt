@@ -1,0 +1,8 @@
+-- Show the core background processes,
+-- currently running in this database instance.
+-- DJ Berndt (dberndt@usf.edu)
+
+SELECT *
+FROM v$bgprocess
+WHERE  paddr <> '00'
+ORDER BY name;
